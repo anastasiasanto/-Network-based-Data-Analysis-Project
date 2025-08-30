@@ -1,0 +1,28 @@
+GEO accession: 
+GSE215450
+  	Go
+Series GSE215450		Query DataSets for GSE215450
+Status	Public on Oct 26, 2022
+Title	Circulating microRNAs in relapsing MS patients treated with dimethyl fumarate in the phase 4 TREMEND trial
+Organism	Homo sapiens
+Experiment type	Non-coding RNA profiling by array
+Summary	Dimethyl fumarate (DMF) is an oral drug approved for relapsing multiple sclerosis (MS) that leads to reduction of neurofilament light (NFL). This may be related to dynamics and persistence of microRNA signatures in the peripheral blood of treatment-naïve MS patients before and after dimethyl fumarate (DMF) at different time points. 210 blood samples were collected from 51 treatment-naïve patients at baseline (BL) and after 1-3, 4-7, 9-15 and 21-27 months of DMF and from 22 controls from the phase IV TREMEND trial. Using microarray, 1,085 miRNAs were two-folds above the background and compared versus NFL. Altered miRNA profiles peaked after 4-7 months. MiR-16-5p and miR-4306, involved in the NF-kB-pathway, were upregulated in low NFL samples, while miR-940 and miR-4665-3p were upregulated in high NFL samples. NFL and miRNA correlations were strongest after 4-7 months DMF. In four patients with blood samples taken at all 5 time points, time-series analysis found miR-146a-5p, the inhibitor of the NF-kB-pathway, increased 1-3 months after treatment. DMF induces dynamic changes in composite miRNA profiles 4-7 months after initiation, several involved in the NF-kB-pathway. Upregulation of miR-16-5p and miR-4306 in low-NFL, while miR-940 and miR-4665-3p in high-NFL samples may indicate a response to DMF treatment.
+ 	
+Overall design	210 blood samples from the TREMEND (Tecfidera in Relapsing-Remitting Multiple Sclerosis: Endothelial Dysfunction) phase IV clinical trial was divided into six different groups. Controls: blood 22 healthy controls. Baseline: 51 RRMS patients before Tecfidera (DMF) treatment. Early: 45 RRMS patients 1-3 month after DMF treatment. Intermediate: 20 RRMS patients 4-7 month after DMF treatment. 1-year: 49 RRMS patient after 1-year with DMF treatment. Long term: 23 RRMS patients 2 years after start of treatment with DMF. MicroRNA detections from RNA extracts of the whole blood samples were obtained with miRNA Microarray System.
+ 	
+Contributor(s)	Elkjaer ML, Lohse RM, Burton M, Mendoza JP, Thomassen M, Sejbaek T, Illes Z
+Citation missing	Has this study been published? Please login to update or notify GEO.
+Submission date	Oct 13, 2022
+Last update date	Oct 29, 2022
+Contact name	Klaus Brusgaard
+E-mail(s)	Klaus.Brusgaard@rsyd.dk
+Organization name	Odense University Hospital
+Department	Department of Clinical Genetics
+Street address	J.B. Winsløws Vej 4
+City	Odense C
+State/province	Syddanmark
+ZIP/Postal code	DK-5000
+Country	Denmark
+ 	
+Platforms (1)	
+GPL25134	Agilent-070156 Human_miRNA_V21.0_Microarray 046064 (miRNA ID version)

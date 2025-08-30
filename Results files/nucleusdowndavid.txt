@@ -1,0 +1,56 @@
+ID	Gene Name	Species
+ADAM19	ADAM metallopeptidase domain 19(ADAM19)	Homo sapiens	
+BACH2	BTB domain and CNC homolog 2(BACH2)	Homo sapiens	
+BTG1	BTG anti-proliferation factor 1(BTG1)	Homo sapiens	
+DCAF6	DDB1 and CUL4 associated factor 6(DCAF6)	Homo sapiens	
+DNMT1	DNA methyltransferase 1(DNMT1)	Homo sapiens	
+TOP1	DNA topoisomerase I(TOP1)	Homo sapiens	
+ELK4	ETS transcription factor ELK4(ELK4)	Homo sapiens	
+FERMT2	FERM domain containing kindlin 2(FERMT2)	Homo sapiens	
+GLIS3	GLIS family zinc finger 3(GLIS3)	Homo sapiens	
+PLAGL2	PLAG1 like zinc finger 2(PLAGL2)	Homo sapiens	
+PRDM4	PR/SET domain 4(PRDM4)	Homo sapiens	
+PRDM8	PR/SET domain 8(PRDM8)	Homo sapiens	
+SKI	SKI proto-oncogene(SKI)	Homo sapiens	
+WTAP	WT1 associated protein(WTAP)	Homo sapiens	
+AUTS2	activator of transcription and developmental regulator AUTS2(AUTS2)	Homo sapiens	
+ASF1A	anti-silencing function 1A histone chaperone(ASF1A)	Homo sapiens	
+CREM	cAMP responsive element modulator(CREM)	Homo sapiens	
+CCAR1	cell division cycle and apoptosis regulator 1(CCAR1)	Homo sapiens	
+CDKN3	cyclin dependent kinase inhibitor 3(CDKN3)	Homo sapiens	
+CPEB2	cytoplasmic polyadenylation element binding protein 2(CPEB2)	Homo sapiens	
+DPH3	diphthamide biosynthesis 3(DPH3)	Homo sapiens	
+DYRK4	dual specificity tyrosine phosphorylation regulated kinase 4(DYRK4)	Homo sapiens	
+EIF3E	eukaryotic translation initiation factor 3 subunit E(EIF3E)	Homo sapiens	
+EXO5	exonuclease 5(EXO5)	Homo sapiens	
+XPOT	exportin for tRNA(XPOT)	Homo sapiens	
+FMR1	fragile X messenger ribonucleoprotein 1(FMR1)	Homo sapiens	
+HAND2	heart and neural crest derivatives expressed 2(HAND2)	Homo sapiens	
+HOXD8	homeobox D8(HOXD8)	Homo sapiens	
+HIPK1	homeodomain interacting protein kinase 1(HIPK1)	Homo sapiens	
+IRF2	interferon regulatory factor 2(IRF2)	Homo sapiens	
+LDHAL6B	lactate dehydrogenase A like 6B(LDHAL6B)	Homo sapiens	
+LATS2	large tumor suppressor kinase 2(LATS2)	Homo sapiens	
+KMT2C	lysine methyltransferase 2C(KMT2C)	Homo sapiens	
+MBD4	methyl-CpG binding domain 4, DNA glycosylase(MBD4)	Homo sapiens	
+MBD2	methyl-CpG binding domain protein 2(MBD2)	Homo sapiens	
+MECP2	methyl-CpG binding protein 2(MECP2)	Homo sapiens	
+MAPK8	mitogen-activated protein kinase 8(MAPK8)	Homo sapiens	
+MAP3K7	mitogen-activated protein kinase kinase kinase 7(MAP3K7)	Homo sapiens	
+MLH1	mutL homolog 1(MLH1)	Homo sapiens	
+NELFE	negative elongation factor complex member E(NELFE)	Homo sapiens	
+NFIB	nuclear factor I B(NFIB)	Homo sapiens	
+ONECUT2	one cut homeobox 2(ONECUT2)	Homo sapiens	
+RSBN1L	round spermatid basic protein 1 like(RSBN1L)	Homo sapiens	
+SERF1A	small EDRK-rich factor 1A(SERF1A)	Homo sapiens	
+SERF1A, SERF1B	small EDRK-rich factor 1B(SERF1B)	Homo sapiens	
+TENM1	teneurin transmembrane protein 1(TENM1)	Homo sapiens	
+UBE2B	ubiquitin conjugating enzyme E2 B(UBE2B)	Homo sapiens	
+USP45	ubiquitin specific peptidase 45(USP45)	Homo sapiens	
+VEZF1	vascular endothelial zinc finger 1(VEZF1)	Homo sapiens	
+ZNF101	zinc finger protein 101(ZNF101)	Homo sapiens	
+ZNF292	zinc finger protein 292(ZNF292)	Homo sapiens	
+ZNF440	zinc finger protein 440(ZNF440)	Homo sapiens	
+ZNF501	zinc finger protein 501(ZNF501)	Homo sapiens	
+ZNF77	zinc finger protein 77(ZNF77)	Homo sapiens	
+ZNF827	zinc finger protein 827(ZNF827)	Homo sapiens	

@@ -1,0 +1,452 @@
+rf-data1-ttest - 219
+Call:
+ randomForest(x = t(rf1), y = as.factor(group1), ntree = 1000) 
+               Type of random forest: classification
+                     Number of trees: 1000
+No. of variables tried at each split: 14
+
+        OOB estimate of  error rate: 29.73%
+Confusion matrix:
+  C  E class.error
+C 2 20  0.90909091
+E 2 50  0.03846154
+
+rf-data2-tttest-208
+Call:
+ randomForest(x = t(rf1), y = as.factor(group2), ntree = 1000) 
+               Type of random forest: classification
+                     Number of trees: 1000
+No. of variables tried at each split: 14
+
+        OOB estimate of  error rate: 6.67%
+Confusion matrix:
+   C  L class.error
+C 20  2  0.09090909
+L  1 22  0.04347826
+
+
+
+LDA - data2 
+
+Linear Discriminant Analysis 
+
+ 45 samples
+208 predictors
+  2 classes: 'control', 'long-term' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 41, 41, 39, 40, 40, 41, ... 
+Resampling results:
+
+  Accuracy  Kappa    
+  0.96      0.9160839
+
+
+LDA - data1 cv
+
+Linear Discriminant Analysis 
+
+ 74 samples
+219 predictors
+  2 classes: 'baseline', 'control' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 67, 66, 66, 67, 66, 67, ... 
+Resampling results:
+
+  Accuracy   Kappa    
+  0.8892857  0.7032061
+
+
+data1 resamples
+
+summary.resamples(object = results1)
+
+Models: LDA, RF 
+Number of resamples: 10 
+
+Accuracy 
+         Min.   1st Qu.    Median      Mean   3rd Qu.  Max. NA's
+LDA 0.7142857 0.8571429 0.8660714 0.8892857 0.9687500 1.000    0
+RF  0.6250000 0.7142857 0.7321429 0.7589286 0.8571429 0.875    0
+
+Kappa 
+    Min.   1st Qu.     Median      Mean   3rd Qu.      Max. NA's
+LDA  0.0 0.6150895 0.70496894 0.7032061 0.9375000 1.0000000    0
+RF  -0.2 0.0000000 0.07142857 0.2421849 0.5882353 0.7142857    0
+
+data1 rfcv
+
+Random Forest 
+
+ 74 samples
+219 predictors
+  2 classes: 'baseline', 'control' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 67, 66, 66, 67, 66, 67, ... 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa       
+    2   0.7589286   0.242184874
+  110   0.6892857   0.009217841
+  219   0.6767857  -0.029243697
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mtry = 2.
+
+data2 lda cv
+
+Linear Discriminant Analysis 
+
+ 45 samples
+208 predictors
+  2 classes: 'control', 'long-term' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 41, 41, 39, 40, 40, 41, ... 
+Resampling results:
+
+  Accuracy  Kappa    
+  0.96      0.9160839
+
+data2 rf cv
+
+Random Forest 
+
+ 45 samples
+208 predictors
+  2 classes: 'control', 'long-term' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 41, 41, 39, 40, 40, 41, ... 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa    
+    2   0.9500000  0.9000000
+  105   0.8850000  0.7785714
+  208   0.8233333  0.6497835
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mtry = 2.
+
+
+data2 resamples lda e rf
+Call:
+summary.resamples(object = results1)
+
+Models: LDA, RF 
+Number of resamples: 10 
+
+Accuracy 
+         Min.   1st Qu.    Median      Mean   3rd Qu.  Max. NA's
+LDA 0.7142857 0.8571429 0.8660714 0.8892857 0.9687500 1.000    0
+RF  0.6250000 0.7142857 0.7321429 0.7589286 0.8571429 0.875    0
+
+Kappa 
+    Min.   1st Qu.     Median      Mean   3rd Qu.      Max. NA's
+LDA  0.0 0.6150895 0.70496894 0.7032061 0.9375000 1.0000000    0
+RF  -0.2 0.0000000 0.07142857 0.2421849 0.5882353 0.7142857    0
+
+10cv10times resamples data1
+
+rf normale data1 p.value=0,001
+
+Call:
+ randomForest(x = t(rf1), y = as.factor(group1), ntree = 1000) 
+               Type of random forest: classification
+                     Number of trees: 1000
+No. of variables tried at each split: 4
+
+        OOB estimate of  error rate: 24.32%
+Confusion matrix:
+  C  E class.error
+C 6 16  0.72727273
+E 2 50  0.03846154
+
+rf normale data2 p.value =0,001
+
+resamples data2 con lasso 0,1
+
+Call:
+summary.resamples(object = results)
+
+Models: RF, LDA, Lasso 
+Number of resamples: 10 
+
+Accuracy 
+      Min. 1st Qu. Median      Mean 3rd Qu.      Max. NA's
+RF     0.8     1.0   1.00 0.9800000    1.00 1.0000000    0
+LDA    0.8     1.0   1.00 0.9600000    1.00 1.0000000    0
+Lasso  0.2     0.5   0.55 0.5933333    0.75 0.8333333    0
+
+Kappa 
+            Min. 1st Qu.    Median      Mean 3rd Qu.      Max. NA's
+RF     0.5454545       1 1.0000000 0.9545455     1.0 1.0000000    0
+LDA    0.6153846       1 1.0000000 0.9230769     1.0 1.0000000    0
+Lasso -0.6666667       0 0.1428571 0.1831169     0.5 0.6666667    0
+
+resamples data1 con lasso 0,1
+
+Call:
+summary.resamples(object = results)
+
+Models: RF, LDA, Lasso 
+Number of resamples: 10 
+
+Accuracy 
+           Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+RF    0.6250000 0.7232143 0.8571429 0.8107143 0.8571429    1    0
+LDA   0.5714286 0.7500000 0.8571429 0.8196429 0.8750000    1    0
+Lasso 0.5714286 0.7767857 0.8660714 0.8513889 0.9722222    1    0
+
+Kappa 
+            Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+RF    0.00000000 0.3211538 0.5882353 0.4744973 0.5970588    1    0
+LDA   0.08695652 0.4932127 0.6419437 0.5863475 0.7142857    1    0
+Lasso 0.08695652 0.5220588 0.6577540 0.6702238 0.9375000    1    0
+
+
+train scudo data1
+Object of class ScudoResults
+Result of scudoTrain 
+
+Number of samples      :  37 
+Number of groups       :  2 
+    Control :  11 samples
+    Baseline :  26 samples
+upSignatures length    :  25 
+downSignatures length  :  25 
+Fold-changes           :  computed 
+    grouped            :  No  
+Feature selection      :  performed
+    Test               :  Wilcoxon rank sum test
+    p-value cutoff     :  0.05 
+    p.adjust method    :  none 
+    Selected features  :  70
+
+scudo accuracy data1
+
+Confusion Matrix and Statistics
+
+          Reference
+Prediction Control Baseline
+  Control        7        4
+  Baseline       4       22
+                                          
+               Accuracy : 0.7838          
+                 95% CI : (0.6179, 0.9017)
+    No Information Rate : 0.7027          
+    P-Value [Acc > NIR] : 0.1856          
+                                          
+                  Kappa : 0.4825          
+                                          
+ Mcnemar's Test P-Value : 1.0000          
+                                          
+            Sensitivity : 0.6364          
+            Specificity : 0.8462          
+         Pos Pred Value : 0.6364          
+         Neg Pred Value : 0.8462          
+             Prevalence : 0.2973          
+         Detection Rate : 0.1892          
+   Detection Prevalence : 0.2973          
+      Balanced Accuracy : 0.7413          
+                                          
+       'Positive' Class : Control  
+
+scudo data 1
+Object of class ScudoResults
+Result of scudoTrain 
+
+Number of samples      :  37 
+Number of groups       :  2 
+    Control :  11 samples
+    Baseline :  26 samples
+upSignatures length    :  25 
+downSignatures length  :  25 
+Fold-changes           :  computed 
+    grouped            :  No  
+Feature selection      :  performed
+    Test               :  Wilcoxon rank sum test
+    p-value cutoff     :  0.05 
+    p.adjust method    :  none 
+    Selected features  :  70
+> # inspect signatures
+> upSignatures(trainRes)[1:5,1:5]
+      GSM6668434      GSM6668435     GSM6668438      GSM6668439      GSM6668440
+1   hsa-miR-3909 hsa-miR-6817-3p hsa-miR-767-5p hsa-miR-4704-5p    hsa-miR-3656
+2    hsa-miR-622  hsa-miR-629-5p    hsa-miR-429    hsa-miR-9-5p    hsa-miR-4718
+3   hsa-miR-1246 hsa-miR-3157-3p  hsa-let-7c-5p hsa-miR-302d-5p hsa-miR-6755-3p
+4   hsa-miR-4272 hsa-miR-1288-5p    hsa-miR-646    hsa-miR-4309 hsa-miR-518c-5p
+5 hsa-miR-629-5p    hsa-miR-4718   hsa-miR-3973 hsa-miR-1288-5p    hsa-miR-3973
+> consensusUpSignatures(trainRes)[1:5, ]
+         Control        Baseline
+1   hsa-miR-4272   hsa-miR-22-3p
+2 hsa-miR-629-5p    hsa-miR-4656
+3   hsa-miR-3973 hsa-miR-200c-5p
+4   hsa-miR-1246 hsa-miR-5006-5p
+5   hsa-miR-4682 hsa-miR-550b-3p
+
+data2 scudo result 
+
+Object of class ScudoResults
+Result of scudoTrain 
+
+Number of samples      :  23 
+Number of groups       :  2 
+    Control :  11 samples
+    Long term :  12 samples
+upSignatures length    :  25 
+downSignatures length  :  25 
+Fold-changes           :  computed 
+    grouped            :  No  
+Feature selection      :  performed
+    Test               :  Wilcoxon rank sum test
+    p-value cutoff     :  0.05 
+    p.adjust method    :  none 
+    Selected features  :  50
+> # inspect signatures
+> upSignatures(trainRes)[1:5,1:5]
+       GSM6668436      GSM6668437      GSM6668438      GSM6668439      GSM6668442
+1  hsa-miR-20a-5p  hsa-miR-20a-5p     hsa-miR-421 hsa-miR-6808-3p    hsa-miR-320b
+2    hsa-miR-1246 hsa-miR-4761-5p hsa-miR-5187-5p  hsa-miR-20a-5p    hsa-miR-320a
+3    hsa-miR-4509 hsa-miR-6783-5p  hsa-miR-20a-5p    hsa-miR-4309  hsa-miR-20a-5p
+4 hsa-miR-6855-5p hsa-miR-6808-3p hsa-miR-4738-3p hsa-miR-6804-5p    hsa-miR-549a
+5   hsa-miR-3689f    hsa-miR-4682  hsa-miR-23b-5p hsa-miR-106b-3p hsa-miR-6855-5p
+> consensusUpSignatures(trainRes)[1:5, ]
+          Control       Long term
+1    hsa-miR-4509  hsa-miR-92a-3p
+2     hsa-miR-573 hsa-miR-550b-3p
+3    hsa-miR-6071     hsa-miR-604
+4 hsa-miR-5187-5p    hsa-miR-320b
+5     hsa-miR-421 hsa-miR-3189-5p
+
+scudo accuracy data2
+Confusion Matrix and Statistics
+
+           Reference
+Prediction  Control Long term
+  Control        10         0
+  Long term       1        11
+                                          
+               Accuracy : 0.9545          
+                 95% CI : (0.7716, 0.9988)
+    No Information Rate : 0.5             
+    P-Value [Acc > NIR] : 5.484e-06       
+                                          
+                  Kappa : 0.9091          
+                                          
+ Mcnemar's Test P-Value : 1               
+                                          
+            Sensitivity : 0.9091          
+            Specificity : 1.0000          
+         Pos Pred Value : 1.0000          
+         Neg Pred Value : 0.9167          
+             Prevalence : 0.5000          
+         Detection Rate : 0.4545          
+   Detection Prevalence : 0.4545          
+      Balanced Accuracy : 0.9545          
+                                          
+       'Positive' Class : Control         
+        
+
+                              
+resamples finale 
+
+
+
+Call:
+summary.resamples(object = results)
+
+Models: RF, LDA, Lasso, RBS 
+Number of resamples: 10 
+
+Accuracy 
+      Min. 1st Qu. Median  Mean 3rd Qu. Max. NA's
+RF    0.75     1.0    1.0 0.955  1.0000    1    0
+LDA   0.75     0.8    1.0 0.910  1.0000    1    0
+Lasso 0.20     0.5    0.6 0.615  0.7125    1    0
+RBS   0.75     1.0    1.0 0.975  1.0000    1    0
+
+Balanced_Accuracy 
+           Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+RF    0.7500000 1.0000000 1.0000000 0.9500000 1.0000000    1    0
+LDA   0.7500000 0.7708333 1.0000000 0.9083333 1.0000000    1    0
+Lasso 0.1666667 0.5000000 0.6666667 0.6416667 0.7291667    1    0
+RBS   0.8333333 1.0000000 1.0000000 0.9833333 1.0000000    1    0
+
+Detection_Rate 
+           Min. 1st Qu. Median  Mean 3rd Qu.      Max. NA's
+RF    0.2000000  0.4250   0.50 0.470     0.5 0.6000000    0
+LDA   0.2000000  0.4000   0.45 0.425     0.5 0.6000000    0
+Lasso 0.0000000  0.2125   0.40 0.325     0.5 0.5000000    0
+RBS   0.3333333  0.4250   0.50 0.490     0.5 0.6666667    0
+
+F1 
+           Min.   1st Qu.    Median      Mean 3rd Qu. Max. NA's
+RF    0.6666667 1.0000000 1.0000000 0.9466667    1.00    1    0
+LDA   0.6666667 0.8000000 1.0000000 0.8933333    1.00    1    0
+Lasso 0.5000000 0.6666667 0.6666667 0.7291667    0.75    1    2
+RBS   0.8000000 1.0000000 1.0000000 0.9800000    1.00    1    0
+
+Kappa 
+            Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+RF     0.5000000 1.0000000 1.0000000 0.9045455 1.0000000    1    0
+LDA    0.5000000 0.5629371 1.0000000 0.8160839 1.0000000    1    0
+Lasso -0.6666667 0.0000000 0.2857143 0.2690476 0.4464286    1    0
+RBS    0.5000000 1.0000000 1.0000000 0.9500000 1.0000000    1    0
+
+Neg_Pred_Value 
+           Min. 1st Qu.    Median      Mean 3rd Qu. Max. NA's
+RF    0.7500000  1.0000 1.0000000 0.9750000       1    1    0
+LDA   0.6666667  0.8125 1.0000000 0.9083333       1    1    0
+Lasso 0.3333333  0.4750 0.8333333 0.7375000       1    1    2
+RBS   0.5000000  1.0000 1.0000000 0.9500000       1    1    0
+
+Pos_Pred_Value 
+           Min. 1st Qu. Median      Mean 3rd Qu. Max. NA's
+RF    0.6666667     1.0    1.0 0.9666667       1    1    0
+LDA   0.6666667     1.0    1.0 0.9666667       1    1    0
+Lasso 0.0000000     0.5    0.5 0.6666667       1    1    1
+RBS   1.0000000     1.0    1.0 1.0000000       1    1    0
+
+Precision 
+           Min. 1st Qu. Median      Mean 3rd Qu. Max. NA's
+RF    0.6666667     1.0    1.0 0.9666667       1    1    0
+LDA   0.6666667     1.0    1.0 0.9666667       1    1    0
+Lasso 0.0000000     0.5    0.5 0.6666667       1    1    1
+RBS   1.0000000     1.0    1.0 1.0000000       1    1    0
+
+Recall 
+           Min. 1st Qu. Median      Mean 3rd Qu. Max. NA's
+RF    0.5000000   1.000      1 0.9500000       1    1    0
+LDA   0.5000000   0.750      1 0.8666667       1    1    0
+Lasso 0.0000000   0.375      1 0.6833333       1    1    0
+RBS   0.6666667   1.000      1 0.9666667       1    1    0
+
+Sensitivity 
+           Min. 1st Qu. Median      Mean 3rd Qu. Max. NA's
+RF    0.5000000   1.000      1 0.9500000       1    1    0
+LDA   0.5000000   0.750      1 0.8666667       1    1    0
+Lasso 0.0000000   0.375      1 0.6833333       1    1    0
+RBS   0.6666667   1.000      1 0.9666667       1    1    0
+
+Specificity 
+      Min.   1st Qu.    Median Mean 3rd Qu. Max. NA's
+RF     0.5 1.0000000 1.0000000 0.95       1    1    0
+LDA    0.5 1.0000000 1.0000000 0.95       1    1    0
+Lasso  0.0 0.3333333 0.6666667 0.60       1    1    0
+RBS    1.0 1.0000000 1.0000000 1.00       1    1    0
+
+
+
+
+-----------------
+
+Analysis of MicroRNA-18a Expression in Multiple Sclerosis Patients
+Atefeh Sohan Forooshan Moghadam,1 Mitra Ataei,2 Ghazaleh Arabzadeh,3 Kowsar Falahati,4 Fatemeh Roshani,5 and Mohammad Hossein Sanati*,6

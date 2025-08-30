@@ -1,0 +1,871 @@
+---
+title: "Advanced data analysis project"
+output: html_notebook
+---
+```{r}
+#NETWORK based DATA analysis
+PACKAGES <- c(
+  "caret",          # To create data partitions
+  "dendextend",     # To plot dendrograms more clearly
+  "factoextra",     # To get better plots (ggplot wrapper)
+  "genefilter",     # To remove low count genes
+  "ggplot2",        # To plot and save images
+  "glmnet",         # To perform lasso-ridge
+  "glue",           # To use f strings 
+  "igraph",         # To plot SCUDO results
+  "MASS",           # To use LDA function 
+  "pROC",           # To plot ROC curves
+  "randomForest",   # To use random forest algorithm
+  "colorBlindness", # To create color blind friendly and aesthetic palette
+  "RColorBrewer",   # To define heatmap palette
+  "reshape2",       # To melt dataset for plotting
+  "ROCR",           # To plot ROC curves 
+  "rScudo",         # To perform SCUDO classification
+  "tidyverse",      # To make data handling easier
+  "GEOquery",
+  "useful"
+)
+```
+
+```{r}
+invisible(lapply(PACKAGES, library, character.only = TRUE))
+gse1<- getGEO("GSE215450") #GSE identifier of the file
+
+View(gse1)
+length(gse1)
+gse<-gse1[[1]]
+show(gse)
+head(exprs(gse))
+ex<- exprs(gse)
+unique(is.na(ex))
+ex<- na.omit(as.matrix(ex))
+
+#ORDINA LE COLONNE E SCEGLI I GRUPPI CHE VUOI : 3
+colnames(ex)
+view(gse)
+meta<-pData(gse)
+meta<- as.data.frame(meta)
+# length(gse$source_name_ch1[gse$`timepoint:ch1`=="Control"]) #orange 22
+# length(gse$source_name_ch1[gse$`timepoint:ch1`=="Baseline group"]) #verde 52
+# length(gse$source_name_ch1[gse$`timepoint:ch1`=="Long term group"]) #rosso 23
+data<-ex[]
+INC<-which(gse$`timepoint:ch1`=="Control")#orange 22
+INE<-which(gse$`timepoint:ch1`=="Baseline group") #verde 52
+INL<-which(gse$`timepoint:ch1`=="Long term group") #rosso 23
+dataz<-data[,c(INC,INE,INL)]
+data1<-data[,c(INC,INE)]
+data2<-data[,c(INC,INL)]
+dim(data2)
+colnames(data2)
+data3<-data[,c(INE,INL)]
+dim(data2)
+head(data)
+
+#Analyze value distributions 
+boxplot(data2)# il prof ha detto che a questi dati è già stato applicato il log
+datal<-log2(data2)
+boxplot(data2, las=2, xlab="Samples", ylab="log(value)", cex.lab=1, cex.axis=0.4) #median allined => no normalization needeed
+```
+
+## Principal component analysis 
+
+```{r}
+res_pca <- prcomp(t(data2))
+```
+Save table of dimension contribution
+```{r}
+eig_PCA <- get_eig(res_pca)
+```
+Display and save Scree plot 
+```{r}
+fviz_eig(res_pca)
+ggsave(
+  paste(glue("Scree_plot.jpg")),
+  path = IMG_FOLDER, 
+  device='jpg', 
+  dpi=700)
+```
+
+Save order of genes by model contribution 
+```{r}
+ord_pca <- facto_summarize(res_pca, "var") %>%
+  arrange(desc(contrib))
+```
+#Plot PCA and save it 
+
+```{r}
+fviz_pca_ind(
+  res_pca,
+  geom = "point",
+  habillage = factor(c(rep("control",22), rep("long-term",23))),
+  legend.title = "Patients",
+  mean.point = FALSE,
+  palette = c("red", "green"),
+  pointshape = 1,
+  pointsize = 2,
+  title = "PCA - Main directions",
+  ) +
+   theme_gray()
+
+#3 gruppi quindi 3 colori
+
+grpcol2<- c(rep("green", 22), rep("darkorchid4",23 ))
+
+#plottare le prime due componenti
+#set palette 
+PALETTE_DIFF <- colorBlindness::paletteMartin
+PALETTE_GRAD <- colorBlindness::Blue2DarkRed18Steps
+COL_GC <- PALETTE_GRAD[4]
+COL_HT <- PALETTE_GRAD[14]
+```
+
+#K-MEANS CLUSTERING
+
+```{r}
+#Compute k-means 
+SEED<-1234
+set.seed(SEED)                                   
+NUM_K_KM <- 2 
+GROUPS <- factor(c(rep("Control", 22),rep("Long Term",23 )))
+res_kmeans <- kmeans(t(rf2), NUM_K_KM, nstart=25)  # Compute k-mean
+table(res_kmeans$cluster,GROUPS)
+```
+
+Plot and save results 
+```{r}
+# Values to display in the legend
+SCALE_BREAKS <- c(
+  "Cluster 1 - Control",
+  "Cluster 1 - Long term",
+  "Cluster 2 - Control",
+  "Cluster 2 - Long term"
+)
+
+COL_KMEANS <- c(
+  PALETTE_GRAD[1], 
+  PALETTE_GRAD[15],
+  PALETTE_GRAD[3],
+  PALETTE_GRAD[18],
+  "red",  # Cluster 1 throwaway 
+  "red"   # Cluster 2 throwaway
+)
+
+IS_CLUSTER_2 <- res_kmeans$cluster==2
+GROUPS <- factor(c(rep("Control", 22),rep("Long Term",23 )))
+groups<-rep("Cluster 1 - Long Term", 45) 
+groups[1:22] <- str_replace(groups[1:22], "Long Term", "Control") 
+groups[which(IS_CLUSTER_2)] <- str_replace(groups[which(IS_CLUSTER_2)],"1","2")
+
+fviz_cluster(
+  res_kmeans, t(rf2),
+  axes = c(1, 2),
+  ellipse.alpha = 0.25,
+  geom = NULL,
+  main = "K-Means Results",
+  show.clust.cent = FALSE,
+) +
+  geom_point(
+    aes(colour = groups), 
+    shape = IS_CLUSTER_2,
+  ) + 
+  scale_color_manual(
+    breaks=SCALE_BREAKS, 
+    values=COL_KMEANS,
+    name = "tissue"
+  )
+
+ggsave(
+  paste(glue("Kmeans_plot.jpg")),
+  path = IMG_FOLDER, 
+  device='jpg', 
+  dpi=700)
+
+fviz_cluster(
+  res_kmeans, 
+  t(data2),
+  axes = c(1, 2),
+  ellipse.alpha = 0.25,
+  geom = NULL,
+  main = "K-Means Results",
+  show.clust.cent = FALSE,
+) +
+  geom_point(
+    aes(colour = GROUPS), 
+    shape = IS_CLUSTER_2,
+  ) + 
+  scale_color_manual(
+    breaks=SCALE_BREAKS, 
+    values=COL_KMEANS,
+    name = "tissue"
+  )
+
+ggsave(
+  paste(glue("Kmeans_plot.jpg")),
+  path = IMG_FOLDER, 
+  device='jpg', 
+  dpi=700)
+```
+
+```{r}
+library(useful)
+k<-2
+set.seed(1234)
+kmeans_res<- kmeans(t(rf2), k, nstart=25)
+table(kmeans_res$cluster, factor(c(rep("Control", 22),rep("Long Term",23 ))))
+fviz_cluster(kmeans_res, data = t(data2),
+             palette = c("#2E9FDF", "#00AFBB"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+             
+)
+#Note that the cluster visualization is not trivial (space of 7815 dimensions!). We use the
+#plot function in the ‘useful’ package that performs a dimensionality reduction using PCA
+plot(kmeans_res, data=t(rf2))+geom_text(aes(label=c(rep("Control",22),rep("Long Term",23))),hjust=0,vjust=0)
+
+#per avere un risultato più accurato faccio questo clustering 25 volte e vedo ogni volta il .withinss più piccolo 
+```
+
+
+#HIERERCHICAL CLUSTERING
+```{r}
+summary(hc_result)
+groups<- cutree(hc_result, k=10)
+table(groups,f)
+f<-factor(c(rep("Control", 22),rep("Long Term",23 )))
+## Hierarchical clustering
+
+res_hier_tree <- dist(t(rf2)) %>%            # Compute distance matrix
+  hclust(method="ave")                 # Create tree
+
+
+NUM_K_HIER <- 15                                  # Number of clusters
+res_hier_clust <- cutree(res_hier_tree, k=NUM_K_HIER) # Cut tree in clusters
+table(res_hier_clust, f)                    # Print output
+
+Number of K-iterations defined through manual testing 
+A lot of mono-sample branches, which are not ideal (difficult to classify).
+
+dend_hier <- as.dendrogram(res_hier_tree) %>%
+  set("branches_k_color", 
+      value = rep(PALETTE_DIFF, 2)[1:NUM_K_HIER], 
+      k = NUM_K_HIER
+  ) %>%
+  set("labels", rep("", 45))
+
+
+rm(
+  NUM_K_HIER, 
+  res_hier_clust,
+  dend_hier,
+  color_bar
+)
+```
+
+#dendrogramma
+```{r}
+plot(hc_result, hang<- -1, labels = groups) 
+     rect.hclust(hc_result, k=2, which = NULL, h=NULL, border=2, cluster = NULL)
+```
+
+#FILTERING - CHE NON MI è SERVITO
+
+```{r}
+#e.mat <- 2^(data) #reverse of log transformation
+#remove genes whose value is not > 0 in at least 20% of the samples
+## filter genes on raw scale, then return to log scale;
+#Do this only if you have  alot of 0
+library("genefilter")
+#ffun <- filterfun(pOverA(0.20,0.0)) #more than 20 % of the values in a row are largere that 0
+#ho rimosso le righe che hanno il 20 % dei 0, do you relly need
+# t.fil <- genefilter(e.mat,ffun) #ffun whatever function
+# e.r <- log2(e.mat[t.fil,]) 
+#There wasn't NA, so we don't have to do  this kind of filtering
+
+group1 <- c(rep('C',22),rep('E',52))
+group2<-c(rep('C',22),rep('L',23))# classification, in order
+group3<-c(rep('C',52),rep('L',23))
+```
+
+#RANDOM FOREST
+```{r}
+
+library("randomForest")
+library(stats)
+f1 <- factor(c(rep("control",22), rep("baseline",52)))
+f2<- factor(c(rep("control",22), rep("long-term",23)))#vector of labels
+f3<-factor(c(rep("control",52), rep("long-term",23)))
+tt40 <- rowttests(data2,f2)
+#data1
+keepers <- which(tt40$p.value<0.1)#seleziono solo quelli significativi
+length(keepers) #wants the number of feature that provides the best selection
+rf2 <- data2[keepers,]#208   #45
+dim(rf2)
+rownames(rf2)
+write.csv(rownames(rf2),file="filtered_data")
+#data2
+keepers <- which(tt40$p.value<0.1)#seleziono solo quelli significativi
+length(keepers) #wants the number of feature that provides the best selection
+rf2 <- data2[keepers,]#208   #23
+dim(rf2)
+#predict a p-value
+#ANOVA per comparare le medie usando più di due gruppi
+#with this T-test we don't want the formally correct p-value, we are just 
+#filtering, so the p-value adjusted is not mandatory
+
+set.seed(1234)
+#adding labels because is supervised#random forest cross validation to choose the number of tree : 
+print(date())
+rfs2<-randomForest(x=t(rf2), y=as.factor(group2), ntree=1000)
+print(date()) #used for calculate the time required for running - 8 secondi
+plot(rfs2, main="ERROR") #is the error of making a prediction, is used for see how many trees should beused
+#green = % errors just for group A, red for the other and the black is the avg
+#so you have as many linea as the groups +1 for the avg 
+#a trivial test
+#predict(rf, t(data1[, 1:5])) #sui primi 5
+
+```
+
+# graph of sorted importance values
+```{r}
+plot(sort(rfs2$importance, decreasing=TRUE), main="Random Forest", xlab="miRNAs", ylab="Mean Decrease Gini")
+a<-sort(rfs2$importance, decreasing=TRUE)
+a<-data.frame(a)
+colnames(a[,"a"])<-"Mean Decrease Gini"
+  labs(title    = "Random Forest",
+       subtitle = NULL,
+       x        = 'miRNAs',
+       y        = 'Mean Decrease Gini')
+title(main=Random Forest)
+#only the first 100 genes are useful
+#extract the most 'important' genes
+probe.namesrf <- rownames(rfs1$importance)
+top20rfdata2 <- probe.namesrf[order(rfs1$importance, decreasing=TRUE)[1:20]]
+write.csv(top20rfdata2, file = "probes-top20.txt", quote=FALSE, row.names = FALSE, col.names=FALSE)
+rfs2$importance[order(rfs2$importance, decreasing=TRUE)[1:20]]
+#DRAWING AN HEAT MAP
+# Look at variable importance
+imp.temp <- abs(rfs2$importance[,])
+t <- order(imp.temp,decreasing=TRUE)
+plot(c(1:nrow(rf2)),imp.temp[t],log='x',cex.main=1.5,
+     xlab='gene rank',ylab='variable importance',cex.lab=1.5,
+     pch=16,main='Data subset results')
+
+# Get subset of expression values for 25 most 'important' genes
+gn.imp <- names(imp.temp)[t]
+gn.20 <- gn.imp[1:20] # vector of top 25 genes, in order
+t <- is.element(rownames(rf2),gn.20) #is.element checking the presence of 
+# the genes selected in the first 25 genes
+sig.eset <- rf2[t,] # matrix of expression values, not necessarily in order
+```
+
+
+## Make a heatmap, with group differences obvious on plot
+
+```{r}
+library(RColorBrewer)
+hmcol <- colorRampPalette(brewer.pal(8,""))(256)
+colnames(sig.eset) <- group2 # This will label the heatmap columns
+csc <- rep(hmcol[50],45)
+csc[group2=='C'] <- hmcol[200]
+# column side color will be purple for C and orange for L
+  heatmap.2(sig.eset, scale="row", col=hmcol, ColSideColors=csc,Rowv=NA, Colv=NA)
+```
+
+Check that the model stabilizes
+```{r}
+plot(res_rf_filt)
+```
+
+```{r}
+ord_rf_filt <- importance(rfs2) %>% 
+  as.data.frame() %>%
+  arrange(desc(MeanDecreaseGini))
+
+Plot contributions and save the image
+```{r}
+ggplot(
+  ord_rf_filt, 
+  aes(x = seq(1:dim(ord_rf_filt)[1]), y = MeanDecreaseGini)
+) +
+  geom_line() + 
+  xlim(1, 2000) + 
+  coord_trans(x = "log10") + 
+  ylab("Gene importance (Mean Decrease Gini)") + 
+  xlab("n-th gene by Mean Decrease Gini") +
+  scale_x_continuous(breaks = c(1, 10, 50, 100, 200, 500, 1000, 2000)) + 
+  geom_vline(
+    xintercept = 20, 
+    linetype="dashed", 
+    color = PALETTE_DIFF[6], 
+    size=1.25
+  ) + 
+  geom_vline(
+    xintercept = 50, 
+    linetype="dashed", 
+    color = PALETTE_DIFF[13], 
+    size=1.2
+  ) + 
+  geom_vline(
+    xintercept = 100, 
+    linetype="dashed", 
+    color = PALETTE_DIFF[14], 
+    size=1.25
+  )
+
+ggsave(
+  paste(glue("Filt_gini.jpg")),
+  path = IMG_FOLDER, 
+  device='jpg', 
+  dpi=700)
+```
+
+Subset and reshape data to use in the heatmap
+
+Create heatmap
+```{r}
+
+ht <-Heatmap(
+  as.matrix(sig.eset),
+  name = "cpm",
+  cluster_rows = FALSE,
+  cluster_columns = FALSE,
+  row_order = seq(1, 20, 1),
+  column_order = seq(1, 45, 1),
+  row_names_gp = gpar(fontsize = 12),
+  column_names_gp = gpar(fontsize = 6),
+  column_split = factor(c(rep("Control", 22), rep("Long Term", 80))),
+  column_title = "%s",
+  row_split = factor(naming_vector),
+  row_title = "%s",
+  col = colorRamp2(c(0, 100, 200), c("blue", "white", "red")),
+  show_column_names = FALSE
+)
+
+```
+
+Save heatmap
+```{r}
+jpeg(
+  glue(IMG_FOLDER, "/heatmap.jpg"), 
+  height = 24, width = 16, units='cm', res = 700
+)
+draw(ht)
+dev.off()
+```
+
+```{r}
+rm(
+  HEAT_TOPBAR,
+  NUM_TREES,
+  NUM_HEAT,
+  res_rf_filt,
+  sample_order,
+  top_heat_filt
+)
+```
+
+
+
+#LINEAR DISCRIMINANT ANALYS
+
+#Feature selection already done in rf1 and rf2
+```{r}
+#wants the number of feature that provides the best selection
+#creo un data set con i dati significativi
+lda1 <- t(rf1) #LDA need transposition
+dat1 <- cbind(as.data.frame(lda1),f1) #LDA need labels, added to the data matrix
+colnames(dat1)[ncol(dat1)] <- "Baseline"
+#lo faccio anche con data2
+lda2<-t(rf2)
+dat2<-cbind(as.data.frame(lda2),f2)
+colnames(dat2)[ncol(dat2)] <- "Long_term"
+
+n.controls <- 22
+n.long <- 23
+n.base<-52
+#split the data set into training and test
+#before sample, we should use set.seed
+set.seed(1234)
+trainprimo <- sample(1:(n.controls), (n.controls-5)) #17 sample random selected
+#sample select in a random way, those are indexes
+test <- setdiff(1:(n.controls),trainprimo) #remaining for the test
+test<- c(test, test+23)
+train <- c(trainprimo, trainprimo+23)
+
+#BiocManager::install("pROC")
+library(pROC)
+library("MASS")
+library(ggplot2)
+set.seed(1234)
+mod <- lda(Long_term ~ ., data=dat2, prior = c(0.5,0.5),
+       subset = trainprimo) #le varaibili sono colineari
+
+par(mar = c(1, 1, 1, 1))
+plot(mod)
+mod.values <- predict(mod, dat[train,])
+names(mod.values)
+plot(mod.values$x[,1], ylab="LDA Axis", xlab="Samples")
+text(mod.values$x[,1],
+      col=c(as.numeric(dat[train,"Long term"])+10))
+on the x we have the index, on the y the result of linera combinationation
+applyed on that data point, some sample (7 and 26 are missclaffied)
+ preds<-predict(mod, dat[test,])
+ preds$class
+
+# #confusion matrix
+table(as.numeric(preds$class),
+       as.numeric(dat[test, "AFFECTED"]) )
+ library("pROC")
+ #ROC, one point because i have only one confusion matrix
+ roc_lda <- plot.roc(as.numeric(preds$class),
+                     as.numeric(dat[test, "AFFECTED"]) )
+
+```
+
+#Since all the problems (every time you run the sample, the traing and test are
+#splitted in diefferente ways, now we are gonn ause the package caret)
+```{r}
+#install.packages("vctrs")
+library("tibble")
+library("vctrs")
+library("caret")
+library("e1071")
+
+# Run algorithms using 10-fold cross validation
+#split the data set using cross-validation
+
+#ora faccio tutto per il primo dataset1 e 2
+control2 <- trainControl(method="cv", number=10) #cv for cross-validation
+metric <- "Accuracy"
+set.seed(1234)
+fit.lda2 <- train(Long_term~., data=dat2, method="lda",
+                 metric=metric, trControl=control2) #train function for calling lda
+#warnings()- le variabili sono collineariiiiii ricordatelo.
+fit.lda2
+plot(fit.lda2)
+#doing random forest
+set.seed(1234)
+fit.rf2 <- train(Long_term~., data=dat2, method="rf",
+                metric=metric, trControl=control)
+
+results2 <- resamples(list(LDA=fit.lda2, RF=fit.rf2))
+summary(results2)
+ggplot(results2) + labs(y = "Accuracy") #for comparing the accuracy
+#the point tihs the mean, and the line is the standard deviation, the spread 
+#depend on the variability of all the 10 different value of accuracy for the cross-validadtion
+```
+
+#REPEATED CROSS VALIDATION
+```{r}
+# Run algorithms using 10-fold cross validation, 10 times
+#is doing 10+10 LDA
+set.seed(1234)
+y1 <- c(rep(0,22),rep(1,52))
+f1 <- factor(y1, labels = c("Control",
+                          "Baseline"))
+control <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
+fit.lda.10 <- train(Baseline~., data=dat1, method="lda",
+                   trControl=control)
+fit.rf.10 <- train(Baseline~., data=dat1, method="rf",
+                   trControl=control)
+fit.lasso <- train(Baseline~., data=dat1, method="glmnet",
+                   family = "binomial",
+                   tuneGrid = expand.grid(alpha = 1,
+                                          lambda = seq(0,1,by=0.05)),
+                   trControl = control)
+model <- scudoModel(nTop = (1:5)*5, nBottom = (1:5)*5,
+                    N = (0.8))
+cvRes200 <- caret::train(x = t(rf1), y=f1,
+                         method = model,
+                         trControl = control)
+results<-resamples(list(RF=fit.rf, LDA=fit.lda, Lasso=fit.lasso, RBS=cvRes200))
+summary(results)
+ggplot(results) + labs(y = "Accuracy") 
+results <- resamples(list(LDA=fit.lda.10, RF=fit.rf.10))
+ggplot(results) + labs(y = "Accuracy")
+
+```
+LASSO
+```{r}
+
+# IMPORTANT: the type of factor changes the
+# way the function glmnet works:
+# - f with numerical values: regression mode
+# - f with categorical values: classification mode
+#install.packages("glmnet")
+
+y2 <- c(rep(0,22),rep(1,23))
+y1<-c(rep(0,22),rep(1,52))
+f1 <- factor(y1)
+f2<-factor(y2)
+
+library("glmnet")
+set.seed(1234)
+fit=glmnet(dat1,f1,standardize=FALSE,family="binomial")
+plot(fit, xvar = "lambda", label=TRUE)
+cfit=cv.glmnet(dat1,f2,standardize=FALSE,family="binomial")
+plot(cfit)
+coef(cfit, s=cfit$lambda.min)
+# repeat analysis but by using train + test sample subsets
+n.controls<-20
+n.affected<-20
+train <- sample(1:(n.controls), (n.controls-5))
+test <- setdiff(1:(n.controls),train)
+test<- c(test, test+20)
+train <- c(train, train+20)
+fit=glmnet(dat[train,],y[train],standardize=FALSE,family="binomial")
+plot(fit)
+cfit=cv.glmnet(dat[train,],y[train],standardize=FALSE,family="binomial")
+plot(cfit)
+predict(fit,dat[test,], type="class", s= cfit$lambda.min)
+# plot ROCR curve
+library("ROCR")
+pred2 <- predict(fit,dat[test,], type="response", s=cfit$lambda.min)
+plot(performance(prediction(pred2, y[test]), 'tpr', 'fpr'))
+# compute Area Under the Curve (AUC)
+auc.tmp <- performance(prediction(pred2, y[test]),"auc")
+auc <- as.numeric(auc.tmp@y.values)
+
+```
+
+CARET + LASSO
+
+```{r}
+y2 <- c(rep("Control",22),rep("Long",23))
+y1<-c(rep("Control",22),rep("Baseline",52))
+f1 <- factor(y1)
+f2<-factor(y2)
+# optional feature selection step
+#install.packages("caret")
+
+set.seed(1234)
+y <- c(rep(0,22),rep(1,23))
+f <- factor(y, labels = c("Control",
+                          "Long_term"))
+control <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
+fit.lda <- train(Long_term~., data=dat2, method="lda",
+                    trControl=control)
+fit.rf <- train(Long_term~., data=dat2, method="rf",
+                   trControl=control)
+fit.lasso <- train(Long_term~., data=dat2, method="glmnet",
+                   family = "binomial",
+                   tuneGrid = expand.grid(alpha = 1,
+                                          lambda = seq(0,1,by=0.05)),
+                   trControl = control)
+model <- scudoModel(nTop = (1:5)*4, nBottom = (1:5)*4,
+                    N = (0.8))
+
+cvRes200 <- caret::train(x = t(rf2), y=f,
+                         method = model,
+                         trControl = control)
+results<-resamples(list(RF=fit.rf, LDA=fit.lda, Lasso=fit.lasso, RBS=cvRes200))
+summary(results)
+ggplot(results) + labs(y = "Accuracy") 
+results <- resamples(list(RF=fit.rf, LDA=fit.lda, Lasso=fit.lasso))
+summary(results)
+ggplot(results) + labs(y = "Accuracy") 
+```
+
+
+RSCUDO 
+```{r}
+y1 <- c(rep(0,22),rep(1,52))
+y2 <- c(rep(0,22),rep(1,23))
+
+f2 <- factor(y2, labels = c("Control",
+                            "Long term"))
+library("caret")
+set.seed(123)
+inTrain <- createDataPartition(f2, list = FALSE)
+trainData <- rf2[, inTrain]
+testData <- rf2[, -inTrain]
+# analyze training set
+library("rScudo")
+set.seed(1234)
+trainRes <- scudoTrain(rf2, groups = f,
+                       nTop = 25, nBottom = 15, alpha = 0.05, N=0.8)
+trainRes
+# inspect signatures
+upSignatures(trainRes)[1:5,1:5]
+consensusUpSignatures(trainRes)[1:5, ]
+# generate and plot map of training samples
+set.seed(1234)
+trainRes <- scudoNetwork(trainRes, N = 0.2)
+scudoPlot(trainNet, vertex.label = NA)
+# perform validation using testing samples
+set.seed(1234)
+testRes <- scudoTest(trainRes, testData, f2[-inTrain],
+                     nTop = 25, nBottom = 25)
+testNet <- scudoNetwork(testRes, N = 0.2)
+scudoPlot(testNet, vertex.label = NA)
+# identify clusters on map
+library("igraph")
+testClust <- igraph::cluster_spinglass(testNet, spins = 2)
+plot(testClust, testNet, vertex.label = NA)
+# perform classification
+set.seed(1234)
+classRes <- scudoClassify(trainData, testData, N = 0.25,
+                          nTop = 12, nBottom = 12,
+                          trainGroups = f2[inTrain], alpha = 0.5)
+caret::confusionMatrix(classRes$predicted, f2[-inTrain])
+
+```
+
+
+SO I FIT RBS WITH THE FOLLOWING VALUES WITH BETTER ACCURACY 
+
+```{r}
+
+#prima provo usando tutti i geni invece che solo alcuni
+library("caret")
+set.seed(123)
+control <- trainControl(method="cv", number=10)
+metric <- "Accuracy"
+tot2 <- t(data2) #LDA need transposition
+data2t <- cbind(as.data.frame(tot2),f2) #LDA need labels, added to the data matrix
+colnames(data2t)[ncol(data2t)] <- "Long_term"
+set.seed(1234)
+fit.lasso <- train(Long_term~., data=data2t, method="glmnet",
+                   family = "binomial",
+                   tuneGrid = expand.grid(alpha = 1,
+                                          lambda = seq(0,1,by=0.05)),
+                   trControl = control,
+                   metric = metric)
+set.seed(1234)
+fit.lda <- train(Long_term~., data=data2t, method="lda",
+                 metric=metric, trControl=control)
+fit.rf <- train(Long_term~., data=data2t, method="rf",
+                metric=metric, trControl=control)
+model <- scudoModel(nTop = (2:6)*5, nBottom = (2:6)*5,
+                    N = 0.8)
+control <- caret::trainControl(method = "cv", number = 10,
+                               summaryFunction =
+                                 caret::multiClassSummary)
+set.seed(1234)
+cvRes <- caret::train(x = t(data2), y=data2t$Long_term,
+                      method = model,metric = metric,
+                      trControl = control)
+
+results <- resamples(list(RF=fit.rf, LDA=fit.lda, Lasso=fit.lasso, RBS=cvRes))
+s<-summary(results)
+ggplot(results) + labs(y = "Accuracy")
+
+
+library("caret")
+set.seed(123)
+
+cvfin
+#inspect signatures
+upSignatures(cvRes200)[1:5,1:5]
+consensusDownSignatures(cvfin)
+
+```
+
+```{r}
+  
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("multiMiR")
+library("multiMiR")
+browseVignettes("multiMiR")
+multimir_results <- get_multimir(org="hsa",
+                                 mirna   = top20rfdata2,
+                                 table   = 'predicted',
+                                 summary = TRUE,
+                                 predicted.cutoff.type = 'n',
+                                 predicted.cutoff      = 10000
+                                 )
+genelist<-unique(multimir_results@data[["target_symbol"]])
+multimir_resultspr <- get_multimir(org="hsa",
+                                 mirna   = top20rfdata2,
+                                 table   = 'predicted',
+                                 summary = TRUE,
+                                 predicted.cutoff.type = 'n',
+                                 predicted.cutoff      = 1000
+)
+genelist<-unique(multimir_resultspr@data[["target_symbol"]])
+write.csv(genelist, file = "genepn200", quote=FALSE, row.names = FALSE)
+
+#creo un dataset limitato ai miei primi 20 microrna
+datarid<-data2[top20rfdata2,]
+#trovo tutti i geni per fare il confronto su david
+multimir_results <- get_multimir(org="hsa",
+                                 mirna   = rownames(data2),
+                                 table   = 'predicted',
+                                 summary = TRUE,
+                                 predicted.cutoff.type = 'n',
+                                 predicted.cutoff      = 25000
+)
+totgene<-unique(multimir_results@data[["target_symbol"]])
+write.csv(totgene, file = "totgenepredicted", quote=FALSE, row.names = FALSE)
+#fold change to understand if it is upregulated or downregulated
+library("gtools")
+x<-apply(X=as.matrix(datarid[,1:22]),MARGIN=1,FUN=mean)
+y<-apply(X=as.matrix(datarid[,23:44]),MARGIN=1,FUN=mean)
+x<-as.numeric(x)
+y<-as.numeric(y)
+foch<-foldchange(y, x)#fold change dei curati rispetto al controllo
+dim(foch)
+fochd<-as.data.frame(foch)
+rownames(fochd)<-rownames(datarid)
+new<-cbind(datarid,fochd)
+down<-new[new["foch"]<1,]
+dim(down)
+up<-new[new["foch"]>1,]
+dim(up)
+#trovo i geni up e down regolati su cui fare le analisi
+multimir_up <- get_multimir(org="hsa",
+                                 mirna   = rownames(up),
+                                 table   = 'predicted',
+                                 summary = TRUE,
+                                 predicted.cutoff.type = 'n',
+                                 predicted.cutoff      = 200
+)
+multimir_down <- get_multimir(org="hsa",
+                            mirna   = rownames(down),
+                            table   = 'predicted',
+                            summary = TRUE,
+                            predicted.cutoff.type = 'n',
+                            predicted.cutoff      = 200
+)
+geneup<-unique(multimir_up@data[["target_symbol"]])
+write.csv(geneup, file = "geneup", quote=FALSE, row.names = FALSE)
+genedown<-unique(multimir_down@data[["target_symbol"]])
+write.csv(genedown, file = "genedown", quote=FALSE, row.names = FALSE)
+```
+
+```{r}
+
+install.packages("BiocManager")
+BiocManager::install("KEGGREST")
+BiocManager::install("KEGGgraph")
+BiocManager::install("AnnotationDbi")
+BiocManager::install("org.Hs.eg.db")
+library("KEGGREST")
+library("KEGGgraph")
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+install.packages("pathfindR")
+library("pathfindR")
+## demo input file: RA_input
+RA_input<-c()
+dim(RA_input)
+head(RA_input)
+## pathway enrichment
+RA_demo <- run_pathfindR(RA_input,
+                         iterations = 1, # keeps running time low - default is 10
+                         visualize_enriched_terms = FALSE) # needed until bug fixed in next release
+head(RA_demo)
+## clutser enriched terms
+RA_demo_clu <- cluster_enriched_terms(RA_demo)
+## term-gene graph of top 10 terms
+term_gene_graph(RA_demo)
+## pathway enrichment can use different networks, different gene sets
+RA_demo2 <- run_pathfindR(RA_input,
+                          gene_sets = "Reactome",
+                          pin_name_path = "GeneMania",
+                          visualize_enriched_terms = FALSE)
+head(RA_demo2)
+```
