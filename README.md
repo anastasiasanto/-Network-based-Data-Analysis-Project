@@ -16,6 +16,4 @@ nism against inflammation and oxidative stress, and leads to
  reduction of neurofilament light (NFL) [3]. Since its precise
  mechanism of action is still not entirely clear, we decided to
  delve into other possible targets of the drug.
-  In this paper we analyse a dataset from the study ”Cir
-culating microRNAs in relapsing MS patients treated with
- dimethyl fumarate in the phase 4 TREMEND trial” 
+  In this paper we analyse a dataset from the study ”Circulating microRNAs in relapsing MS patients treated with dimethyl fumarate in the phase 4 TREMEND trial” 
