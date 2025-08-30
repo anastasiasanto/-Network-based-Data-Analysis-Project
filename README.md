@@ -13,7 +13,7 @@ Studying the effect of dimethyl fumarate (DMF) on Kainate  receptor Ionotropic a
  relapsing-remitting multiple sclerosis (MS); it is an anti inflammatory/immunomodulatory drug that acts by triggering
  activation of the Nrf-2 pathway, a natural defense mecha
 nism against inflammation and oxidative stress, and leads to
- reduction of neurofilament light (NFL) [3]. Since its precise
+ reduction of neurofilament light (NFL). Since its precise
  mechanism of action is still not entirely clear, we decided to
  delve into other possible targets of the drug.
   In this paper we analyse a dataset from the study ”Circulating microRNAs in relapsing MS patients treated with dimethyl fumarate in the phase 4 TREMEND trial” 
